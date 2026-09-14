@@ -21,6 +21,23 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* OVERLAY SIDEBAR DI HP */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 9;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
 /* DASHBOARD UTAMA */
 .dashboard-container {
   display: flex;
@@ -396,10 +413,19 @@ body.dark-mode .trans-table td { border-bottom-color: #334155 !important; color:
 body.dark-mode .btn-secondary { background-color: #334155 !important; color: #f8fafc !important; border-color: #475569 !important; }
 body.dark-mode .btn-secondary:hover { background-color: #475569 !important; }
 
-/* MEDIA QUERIES HP */
+/* MEDIA QUERIES HP (iOS & Android Fix) */
 @media (max-width: 768px) {
-  .sidebar { position: absolute; height: 100%; transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
+  .sidebar { 
+    position: absolute; 
+    top: 0;
+    left: 0;
+    height: 100%; 
+    transform: translateX(-100%);
+    box-shadow: 4px 0 15px rgba(0,0,0,0.15);
+  }
+  .sidebar.open { 
+    transform: translateX(0); 
+  }
   .finance-workspace { grid-template-columns: 1fr; }
   .bill-preview-container { width: 100%; overflow-x: auto; }
 }
