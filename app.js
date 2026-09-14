@@ -18,10 +18,13 @@ const workspaceView = document.getElementById('workspace-view');
 const cardOpenText = document.getElementById('card-open-text');
 const cardOpenFinance = document.getElementById('card-open-finance');
 
-// Sidebar Elements
+// Sidebar & Overlay Elements
 const sidebarTitle = document.getElementById('sidebar-title');
 const btnSidebarAdd = document.getElementById('btn-sidebar-add');
 const notesList = document.getElementById('notes-list');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
 
 // View Editor
 const textEditorView = document.getElementById('text-editor-view');
@@ -55,8 +58,6 @@ const btnExportReceipt = document.getElementById('btn-export-receipt');
 const btnExportTxt = document.getElementById('btn-export-txt');
 const btnDelete = document.getElementById('btn-delete');
 const searchInput = document.getElementById('search-input');
-const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
-const sidebar = document.getElementById('sidebar');
 const btnToggleTheme = document.getElementById('btn-toggle-theme');
 
 // Modal Elements
@@ -66,6 +67,30 @@ const modalTitle = document.getElementById('modal-title');
 const modalMessage = document.getElementById('modal-message');
 const btnModalConfirm = document.getElementById('btn-modal-confirm');
 const btnModalCancel = document.getElementById('btn-modal-cancel');
+
+// HELPER UNTUK MEMBUKA/MENUTUP SIDEBAR DI HP (iOS Fix)
+function openSidebar() {
+  sidebar.classList.add('open');
+  if (window.innerWidth <= 768) {
+    sidebarOverlay.classList.add('active');
+  }
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  sidebarOverlay.classList.remove('active');
+}
+
+function toggleSidebar() {
+  if (sidebar.classList.contains('open')) {
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
+}
+
+btnToggleSidebar.addEventListener('click', toggleSidebar);
+sidebarOverlay.addEventListener('click', closeSidebar);
 
 // LOGIKA THEMA / MODE MALAM
 const savedTheme = localStorage.getItem('catatku_theme') || localStorage.getItem('pwa_theme') || 'light';
@@ -83,7 +108,7 @@ if (btnToggleTheme) {
   });
 }
 
-// SYSTEM MODAL KUSTOM (Pengganti Alert & Confirm bawaan browser)
+// SYSTEM MODAL KUSTOM
 function showCustomAlert(message, title = 'Pemberitahuan', icon = '⚠️') {
   return new Promise((resolve) => {
     modalIcon.textContent = icon;
@@ -129,6 +154,7 @@ cardOpenFinance.addEventListener('click', () => openMode('finance'));
 btnGoHome.addEventListener('click', showHomeDashboard);
 
 function showHomeDashboard() {
+  closeSidebar();
   homeDashboardView.style.display = 'flex';
   workspaceView.style.display = 'none';
   currentMode = null;
@@ -136,6 +162,7 @@ function showHomeDashboard() {
 }
 
 function openMode(mode) {
+  closeSidebar();
   currentMode = mode;
   homeDashboardView.style.display = 'none';
   workspaceView.style.display = 'flex';
@@ -208,7 +235,7 @@ function selectNote(id) {
   activeNoteId = id;
   renderSidebar(searchInput.value);
   loadActiveNote();
-  if (window.innerWidth <= 768) sidebar.classList.remove('open');
+  closeSidebar(); // Menutup sidebar setelah catatan dipilih di iOS/Android
 }
 
 function loadActiveNote() {
@@ -404,6 +431,5 @@ btnExportTxt.addEventListener('click', () => {
 });
 
 searchInput.addEventListener('input', (e) => renderSidebar(e.target.value));
-btnToggleSidebar.addEventListener('click', () => sidebar.classList.toggle('open'));
 
 showHomeDashboard();
