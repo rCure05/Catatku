@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ledger | Personal Finance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-wrap">
+          <div class="brand-mark">L</div>
+          <div>
+            <p class="eyebrow">Personal finance</p>
+            <h1>Ledger</h1>
+          </div>
+        </div>
+
+        <button id="addPageBtn" class="primary-btn"><span class="button-icon">+</span> Kertas baru</button>
+
+        <div class="page-list-header">
+          <span>Catatan</span>
+          <span class="page-count" id="pageCount">0</span>
+        </div>
+        <div id="pageList" class="page-list"></div>
+        <div class="sidebar-tools">
+          <button id="backupBtn" class="sidebar-tool" type="button">↓ Backup data</button>
+          <button id="restoreBtn" class="sidebar-tool" type="button">↑ Restore data</button>
+          <input id="restoreFile" type="file" accept="application/json,.json" hidden />
+        </div>
+      </aside>
+
+      <main class="content">
+        <header class="content-header">
+          <div>
+            <p class="eyebrow light-eyebrow">Selamat datang kembali</p>
+            <h2>Ringkasan keuangan <span class="wave-mark">✦</span></h2>
+          </div>
+          <div class="header-actions">
+            <div class="secure-status"><span class="status-dot"></span> Data tersimpan lokal</div>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Aktifkan mode malam" title="Mode malam"><span class="theme-icon">☾</span><span class="theme-label">Mode malam</span></button>
+          </div>
+        </header>
+        <section class="overview-box" aria-label="Ringkasan semua bulan">
+          <div class="box-header">
+            <div><span class="section-kicker">All workspaces</span></div>
+            <span id="overviewPaperCount" class="section-caption">0 kertas</span>
+          </div>
+          <div class="overview-grid">
+            <div class="overview-stat"><span>Total pemasukan</span><strong id="overviewIncome">Rp 0</strong></div>
+            <div class="overview-stat"><span>Total pengeluaran</span><strong id="overviewExpense">Rp 0</strong></div>
+            <div class="overview-stat"><span>Saldo gabungan</span><strong id="overviewBalance">Rp 0</strong></div>
+            <div class="overview-stat"><span>Transaksi aktif</span><strong id="overviewTransactions">0</strong></div>
+          </div>
+        </section>
+        <div class="dashboard-quick-row">
+          <span class="dashboard-pill"><span class="pill-dot income-dot"></span> Arus kas sehat</span>
+          <span class="dashboard-sync">Update otomatis tersimpan</span>
+        </div>
+        <section class="monthly-trend-box" aria-labelledby="monthlyTrendTitle">
+          <div class="box-header">
+            <div><span class="section-kicker">Monthly trend</span><h3 id="monthlyTrendTitle">Tren arus kas</h3></div>
+            <label class="trend-period-control" for="trendPeriodFilter">Rentang
+              <select id="trendPeriodFilter" class="toolbar-select" aria-label="Rentang grafik tren">
+                <option value="6">6 bulan</option>
+                <option value="12">12 bulan</option>
+                <option value="24">24 bulan</option>
+              </select>
+            </label>
+          </div>
+          <div id="monthlyTrendChart" class="monthly-trend-chart" role="img" aria-label="Grafik tren arus kas bulanan"></div>
+          <p id="monthlyTrendComparison" class="monthly-trend-comparison" aria-live="polite"></p>
+        </section>
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-card">
+            <span class="empty-icon">+</span>
+            <h2>Mulai workspace baru</h2>
+            <p>Buat lembar baru untuk mulai mencatat kegiatan dan keuangan bulanan.</p>
+          </div>
+        </div>
+
+        <section id="editor" class="editor hidden">
+          <div class="panel-topbar">
+            <input id="pageTitle" class="title-input" type="text" placeholder="Judul catatan" />
+            <button id="deletePageBtn" class="danger-btn"><span>×</span> Hapus kertas</button>
+          </div>
+
+          <div class="note-box">
+            <div class="section-heading">
+              <div><span class="section-kicker">Workspace note</span><label for="notesText">Catatan</label></div>
+              <span class="section-caption">Private journal</span>
+            </div>
+            <textarea id="notesText" rows="8" placeholder="Tuliskan catatan harian, agenda, atau hal penting..."></textarea>
+          </div>
+
+          <div class="finance-box">
+            <div class="box-header">
+              <div><span class="section-kicker">Cash flow</span><h3>Catatan keuangan</h3></div>
+              <button id="addRowBtn" class="secondary-btn"><span class="button-icon">+</span> Tambah data</button>
+            </div>
+
+            <div class="summary-grid">
+              <div class="summary-card income">
+                <span>Pemasukan</span>
+                <strong id="totalIncome">Rp 0</strong>
+              </div>
+              <div class="summary-card expense">
+                <span>Pengeluaran</span>
+                <strong id="totalExpense">Rp 0</strong>
+              </div>
+              <div class="summary-card net">
+                <span>Saldo</span>
+                <strong id="netBalance">Rp 0</strong>
+              </div>
+            </div>
+
+            <div class="ledger-toolbar">
+              <label class="toolbar-search"><span>⌕</span><input id="transactionSearch" type="search" placeholder="Cari transaksi atau kategori" /></label>
+              <input id="transactionDateFrom" class="toolbar-select" type="date" aria-label="Transaksi dari tanggal" title="Dari tanggal" />
+              <input id="transactionDateTo" class="toolbar-select" type="date" aria-label="Transaksi sampai tanggal" title="Sampai tanggal" />
+              <select id="transactionTypeFilter" class="toolbar-select" aria-label="Filter jenis transaksi">
+                <option value="all">Semua jenis</option>
+                <option value="income">Pemasukan</option>
+                <option value="expense">Pengeluaran</option>
+              </select>
+              <select id="paymentFilter" class="toolbar-select" aria-label="Filter metode pembayaran">
+                <option value="all">Semua akun</option>
+                <option value="Cash">Cash</option>
+                <option value="Bank transfer">Bank transfer</option>
+                <option value="E-wallet">E-wallet</option>
+                <option value="Kartu">Kartu</option>
+              </select>
+              <select id="transactionSort" class="toolbar-select" aria-label="Urutkan transaksi">
+                <option value="newest">Terbaru</option>
+                <option value="oldest">Terlama</option>
+                <option value="largest">Nominal terbesar</option>
+              </select>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Kategori</th>
+                    <th>Keterangan</th>
+                    <th>Nominal</th>
+                    <th>Jenis</th>
+                    <th>Akun</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="financeTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="recap-box">
+            <div class="box-header recap-header">
+              <div><span class="section-kicker">Bookkeeping recap</span><h3>Rekap per kategori</h3></div>
+              <div class="export-actions">
+                <button id="exportCsvBtn" class="secondary-btn" type="button"><span class="button-icon">↓</span> CSV</button>
+                <button id="exportExcelBtn" class="secondary-btn" type="button"><span class="button-icon">↓</span> Excel</button>
+              </div>
+            </div>
+
+            <div class="bookkeeping-settings">
+              <div class="opening-balance">
+                <div><span class="section-kicker">Starting point</span><label for="openingBalance">Saldo awal bulan</label></div>
+                <input id="openingBalance" class="field amount" type="number" min="0" step="1000" placeholder="0" />
+              </div>
+              <div class="budget-manager">
+                <div><span class="section-kicker">Monthly control</span><strong>Anggaran kategori</strong></div>
+                <div class="budget-form">
+                  <input id="budgetCategory" class="field" type="text" placeholder="Kategori, contoh: Makanan" />
+                  <input id="budgetAmount" class="field amount" type="number" min="0" step="1000" placeholder="Batas nominal" />
+                  <button id="addBudgetBtn" class="secondary-btn" type="button">Tambah anggaran</button>
+                </div>
+                <div id="budgetList" class="budget-list"></div>
+              </div>
+            </div>
+
+            <div class="custom-options">
+              <div><span class="section-kicker">Personalize</span><strong>Opsi input</strong></div>
+              <div class="custom-option-form">
+                <input id="customCategory" class="field" type="text" placeholder="Tambah kategori" />
+                <button id="addCategoryBtn" class="secondary-btn" type="button">Tambah kategori</button>
+                <input id="customPayment" class="field" type="text" placeholder="Tambah akun pembayaran" />
+                <button id="addPaymentBtn" class="secondary-btn" type="button">Tambah akun</button>
+              </div>
+              <div id="customOptionList" class="custom-option-list"></div>
+            </div>
+
+            <div class="recap-stats">
+              <div class="recap-stat"><span>Transaksi tercatat</span><strong id="transactionCount">0</strong></div>
+              <div class="recap-stat"><span>Kategori aktif</span><strong id="categoryCount">0</strong></div>
+              <div class="recap-stat"><span>Rata-rata transaksi</span><strong id="averageTransaction">Rp 0</strong></div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="recap-table">
+                <thead>
+                  <tr>
+                    <th>Kategori</th>
+                    <th>Pemasukan</th>
+                    <th>Pengeluaran</th>
+                    <th>Selisih</th>
+                    <th>Transaksi</th>
+                  </tr>
+                </thead>
+                <tbody id="categorySummaryBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="chart-box">
+            <div class="box-header chart-header">
+              <div><span class="section-kicker">Visual overview</span><h3>Arus kas per kategori</h3></div>
+              <div class="chart-legend"><span><i class="legend-dot income-dot"></i>Pemasukan</span><span><i class="legend-dot expense-dot"></i>Pengeluaran</span></div>
+            </div>
+            <div id="categoryChart" class="category-chart" role="img" aria-label="Grafik arus kas per kategori"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+    <nav class="mobile-nav" aria-label="Navigasi utama">
+      <button class="mobile-nav-item active" type="button"><span>⌂</span><small>Dashboard</small></button>
+      <button class="mobile-nav-item" type="button" onclick="document.getElementById('editor').scrollIntoView({ behavior: 'smooth' })"><span>▤</span><small>Catatan</small></button>
+      <button class="mobile-nav-item" type="button" onclick="document.getElementById('monthlyTrendChart').scrollIntoView({ behavior: 'smooth' })"><span>⌁</span><small>Analitik</small></button>
+      <button class="mobile-nav-item" type="button" onclick="document.getElementById('themeToggle').click()"><span>⚙</span><small>Tampilan</small></button>
+    </nav>
+
+    <div id="confirmDialog" class="confirm-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="confirm-backdrop" data-confirm-cancel></div>
+      <div class="confirm-card">
+        <div class="confirm-icon">!</div>
+        <span class="section-kicker">Delete workspace</span>
+        <h2 id="confirmTitle">Hapus kertas ini?</h2>
+        <p>Semua catatan dan transaksi di dalamnya akan dihapus dari perangkat ini.</p>
+        <div class="confirm-actions">
+          <button id="confirmCancelBtn" class="ghost-btn" type="button">Batal</button>
+          <button id="confirmDeleteBtn" class="confirm-delete-btn" type="button">Ya, hapus</button>
+        </div>
+      </div>
+    </div>
+
+    <template id="financeRowTemplate">
+      <tr>
+        <td><input type="date" class="field date" /></td>
+        <td><input type="text" class="field category" list="categoryOptions" placeholder="Contoh: Makanan" /></td>
+        <td><input type="text" class="field description" placeholder="Keterangan" /></td>
+        <td><input type="number" class="field amount" min="0" step="1000" placeholder="0" /></td>
+        <td>
+          <select class="field type">
+            <option value="income">Pemasukan</option>
+            <option value="expense">Pengeluaran</option>
+          </select>
+        </td>
+        <td>
+          <select class="field payment-method">
+            <option value="Cash">Cash</option>
+            <option value="Bank transfer">Bank transfer</option>
+            <option value="E-wallet">E-wallet</option>
+            <option value="Kartu">Kartu</option>
+          </select>
+        </td>
+        <td>
+          <div class="row-menu">
+            <button class="mini-btn menu-toggle" type="button" aria-label="Buka opsi transaksi" aria-expanded="false">⋯</button>
+            <div class="row-actions hidden">
+              <button class="mini-btn duplicate" type="button" title="Duplikasi transaksi">Salin</button>
+              <button class="mini-btn recurring" type="button" title="Buat tiga bulan berikutnya">+3 bln</button>
+              <button class="mini-btn danger" type="button">Hapus</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </template>
+
+    <datalist id="categoryOptions"></datalist>
+
+    <script src="script.js"></script>
+  </body>
+</html>
